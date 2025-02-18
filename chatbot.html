@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chatbot UI</title>
+    <link rel="stylesheet" href="chatbot.css">
+</head>
+<body>
+    <div class="chat-container">
+        <div class="chat-header">Mental Health Chatbot</div>
+        <div class="chat-box" id="chat-box"></div>
+        <div class="chat-input">
+            <input type="text" id="user-input" placeholder="Type your message...">
+            <button id="send-btn">Send</button>
+            <button id="voice-btn">🎤</button>
+        </div>
+    </div>
+    
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const chatBox = document.getElementById("chat-box");
+            const userInput = document.getElementById("user-input");
+            const sendBtn = document.getElementById("send-btn");
+            const voiceBtn = document.getElementById("voice-btn");
+            
+            function appendMessage(text, sender) {
+                const messageDiv = document.createElement("div");
+                messageDiv.classList.add(sender === "user" ? "user-message" : "bot-message", "fade-in");
+                messageDiv.textContent = text;
+                chatBox.appendChild(messageDiv);
+                chatBox.scrollTop = chatBox.scrollHeight;
+            }
+            
+            function botReply(userText) {
+                const responses = {
+                    "hello": "Hi there! How can I support you today?",
+                    "how are you": "I'm just a bot, but I'm here to help!",
+                    "stress": "Deep breathing and relaxation exercises can help with stress.",
+                    "default": "I'm here to assist. Try asking about mental health tips!"
+                };
+                
+                let response = responses[userText.toLowerCase()] || responses["default"];
+                setTimeout(() => appendMessage(response, "bot"), 1000);
+            }
+            
+            sendBtn.addEventListener("click", function () {
+                let text = userInput.value.trim();
+                if (text !== "") {
+                    appendMessage(text, "user");
+                    userInput.value = "";
+                    botReply(text);
+                }
+            });
+            
+            userInput.addEventListener("keypress", function (event) {
+                if (event.key === "Enter") {
+                    sendBtn.click();
+                }
+            });
+            
+            voiceBtn.addEventListener("click", function () {
+                const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+                recognition.lang = "en-US";
+                recognition.start();
+                
+                recognition.onresult = function (event) {
+                    const voiceText = event.results[0][0].transcript;
+                    userInput.value = voiceText;
+                    sendBtn.click();
+                };
+            });
+        });
+    </script>
+</body>
+</html>
